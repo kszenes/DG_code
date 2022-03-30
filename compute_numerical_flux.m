@@ -35,8 +35,8 @@ for n=1:size(u,4)
     uR(:,1:d2:(d1-1)*d2+1,1,n)=u(:,d2:d2:d1*d2,3,n);
 end
 
-[fxL, fyL] = flux_function(uL,eq_type,radius,qp_x,qp_y);
-[fxR, fyR] = flux_function(uR,eq_type,radius,qp_x,qp_y);
+[fxL, fyL] = flux_function(uL,eq_type,radius,qp_x,qp_y, fact_bd);
+[fxR, fyR] = flux_function(uR,eq_type,radius,qp_x,qp_y, fact_bd);
 
 %compute normal vectors for all faces: 1=bottom, 2=right, 3=top, 4=left
 normal_x=zeros(size(u,1),size(u,2),4); 

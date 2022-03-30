@@ -23,7 +23,7 @@ end
 %INTERNAL INTEGRALS
 
 %compute physical fluxes
-[flux_fun_x, flux_fun_y]=flux_function(u_qp,eq_type,radius,pts2d_phi(1:n_qp,:),pts2d_phi(n_qp+1:2*n_qp,:));    
+[flux_fun_x, flux_fun_y]=flux_function(u_qp,eq_type,radius,pts2d_phi(1:n_qp,:),pts2d_phi(n_qp+1:2*n_qp,:), fact_int);    
 
 %compute internal integral and add it to the rhs
 %det_internal*inverse_of_jacobian_x_affine*sum(dPhi/dr*f_x*weights)+
@@ -64,22 +64,32 @@ end
 
 %add corrective internal term for the divergence, only in spherical
 %coordinates for swe
-if eq_type=="swe_sphere"
-    rhsu(:,:,2)=rhsu(:,:,2)+reshape(phi_val{1}'*reshape(complem_fact.*flux_fun_y(:,:,2).*wts2d,n_qp*d1*d2,1),dim,d1*d2)*determ;
-    rhsu(:,:,3)=rhsu(:,:,3)-reshape(phi_val{1}'*reshape(complem_fact.*flux_fun_x(:,:,2).*wts2d,n_qp*d1*d2,1),dim,d1*d2)*determ;
-    %rhsu(:,:,2)=rhsu(:,:,2)+phi_val'*(complem_fact.*flux_fun_y(:,:,2).*wts2d)*determ;
-    %rhsu(:,:,3)=rhsu(:,:,3)-phi_val'*(complem_fact.*flux_fun_x(:,:,2).*wts2d)*determ;
-end
+% if eq_type=="swe_sphere"
+%     rhsu(:,:,2)=rhsu(:,:,2)+reshape(phi_val{1}'*reshape(complem_fact./fact_int.*flux_fun_y(:,:,3).*wts2d,n_qp*d1*d2,1),dim,d1*d2)*determ;
+%     rhsu(:,:,3)=rhsu(:,:,3)-reshape(phi_val{1}'*reshape(complem_fact./fact_int.*flux_fun_x(:,:,2).*wts2d,n_qp*d1*d2,1),dim,d1*d2)*determ;
+%     %rhsu(:,:,2)=rhsu(:,:,2)+phi_val'*(complem_fact.*flux_fun_y(:,:,2).*wts2d)*determ;
+%     %rhsu(:,:,3)=rhsu(:,:,3)-phi_val'*(complem_fact.*flux_fun_x(:,:,2).*wts2d)*determ;
+% end
 
+
+% source term
+if eq_type == "swe_sphere"
+%     rhsu(:,:,3) = rhsu(:,:,3) + u_qp(:,:,3) .* u_qp(:,:,3) ./ u_qp(:,:,1) .* complem_fact;
+    rhsu(:,:,1)=rhsu(:,:,1) + reshape(phi_val{1}'*reshape(complem_fact./fact_int.*u_qp(:,:,3).*wts2d,n_qp*d1*d2,1),dim,d1*d2)*determ;
+    rhsu(:,:,2)=rhsu(:,:,2) + reshape(phi_val{1}'*reshape(complem_fact./fact_int.*u_qp(:,:,2).*u_qp(:,:,3)./u_qp(:,:,1).*wts2d,n_qp*d1*d2,1),dim,d1*d2)*determ;
+    rhsu(:,:,3)=rhsu(:,:,3) + reshape(phi_val{1}'*reshape(complem_fact./fact_int.*u_qp(:,:,3).*u_qp(:,:,3)./u_qp(:,:,1).*wts2d,n_qp*d1*d2,1),dim,d1*d2)*determ;
+end
 
 %add coriolis term to second and third equation of the swe
 if eq_type=="swe" || eq_type=="swe_sphere"
     coriolis=coriolis_fun(pts2d_phi(1:n_qp,:),pts2d_phi(n_qp+1:2*n_qp,:));
-    rhsu(:,:,2)=rhsu(:,:,2)+radius*reshape(phi_val{1}'*reshape(fact_int.*coriolis.*u_qp(:,:,3).*wts2d,n_qp*d1*d2,1),dim,d1*d2)*determ;
-    rhsu(:,:,3)=rhsu(:,:,3)-radius*reshape(phi_val{1}'*reshape(fact_int.*coriolis.*u_qp(:,:,2).*wts2d,n_qp*d1*d2,1),dim,d1*d2)*determ;
-    %rhsu(:,:,2)=rhsu(:,:,2)+radius*phi_val(:,:)'*(fact_int.*coriolis.*u_qp(:,:,3).*wts2d)*determ;
-	%rhsu(:,:,3)=rhsu(:,:,3)-radius*phi_val(:,:)'*(fact_int.*coriolis.*u_qp(:,:,2).*wts2d)*determ;
-end
+    rhsu(:,:,2)=rhsu(:,:,2)+radius*reshape(phi_val{1}'*reshape(complem_fact.*coriolis.*u_qp(:,:,3).*wts2d,n_qp*d1*d2,1),dim,d1*d2)*determ;
+    rhsu(:,:,3)=rhsu(:,:,3)-radius*reshape(phi_val{1}'*reshape(complem_fact.*coriolis.*u_qp(:,:,2).*wts2d,n_qp*d1*d2,1),dim,d1*d2)*determ;
+%     rhsu(:,:,2)=rhsu(:,:,2)+radius*reshape(phi_val{1}'*reshape(fact_int.*coriolis.*u_qp(:,:,3).*wts2d,n_qp*d1*d2,1),dim,d1*d2)*determ;
+%     rhsu(:,:,3)=rhsu(:,:,3)-radius*reshape(phi_val{1}'*reshape(fact_int.*coriolis.*u_qp(:,:,2).*wts2d,n_qp*d1*d2,1),dim,d1*d2)*determ;
+%     %rhsu(:,:,2)=rhsu(:,:,2)+radius*phi_val(:,:)'*(fact_int.*coriolis.*u_qp(:,:,3).*wts2d)*determ;
+% 	%rhsu(:,:,3)=rhsu(:,:,3)-radius*phi_val(:,:)'*(fact_int.*coriolis.*u_qp(:,:,2).*wts2d)*determ;
+% end
 
 %invert the (local) mass matrix and divide by radius
 for n=1:size(u,3)

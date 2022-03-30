@@ -4,9 +4,13 @@ function [mass,inv_mass] =compute_mass(phi,wts2d,d1,d2,r,hx,hy,factor)
 
 dim=(max(r(:))+1)^2;
 
+% TODO: shouldn't this be zeros?
 %dimensions: (cardinality)x(cardinality)x(num_elems)
 mass=repmat(eye(dim,dim),1,1,d1*d2);
 inv_mass=repmat(eye(dim,dim),1,1,d1*d2);
+
+
+
 
 %determinant of the affine mapping from reference to physical element (this
 %is assumed to be constant)
@@ -14,8 +18,8 @@ determ=hx*hy/4;
 
 for k=1:d1*d2
     
-    elem_x=floor((k-1)/d2)+1;
-    elem_y=mod((k-1),d2)+1;
+    elem_x=floor((k-1)/d2)+1; % element x index
+    elem_y=mod((k-1),d2)+1; % element y index
     r_loc=r(elem_y,elem_x);
     
     for i=1:(r_loc+1)^2
