@@ -10,6 +10,9 @@ mass=repmat(eye(dim,dim),1,1,d1*d2);
 inv_mass=repmat(eye(dim,dim),1,1,d1*d2);
 
 
+% mass=repmat(zeros(dim,dim),1,1,d1*d2);
+% inv_mass=repmat(zeros(dim,dim),1,1,d1*d2);
+
 
 
 %determinant of the affine mapping from reference to physical element (this
@@ -27,6 +30,8 @@ for k=1:d1*d2
             %det*sum(i-th basis function in qp * j-th basis function in qp * metric
             %factor * weights)
             mass(i,j,k)=determ*wts2d'*(phi{r_loc}(:,i).*phi{r_loc}(:,j).*factor(:,k));
+%             mass(i,j,k)=determ*wts2d'*(phi{r_loc}(:,i).*phi{r_loc}(:,j));
+
         end
     end
     

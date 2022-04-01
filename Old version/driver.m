@@ -1,11 +1,11 @@
 clear all; close all; clc;
 
 a=0; b=2*pi; c=-pi/2; d=pi/2; %domain
-d1=80; d2=80; %nb of elems in both directions
+d1=20; d2=20; %nb of elems in both directions
 hx=(b-a)/d1; hy=(d-c)/d2;
 r=1; %polynomial degree
 dim=(r+1)^2;
-eq_type="sphere"; %type of the equation
+eq_type="swe"; %type of the equation
 
 x_e=linspace(a,b,d1+1); y_e=linspace(c,d,d2+1);
 
@@ -122,9 +122,9 @@ mass=compute_mass(phi_val,r,wts2d,d1,d2,hx,hy,fact_int);
 
 %temporal loop
 t=0;
-dt=12; %time step
+dt=300; %time step
 T=12*86400; %final time
-RK=4; %order of the RK scheme
+RK=1; %order of the RK scheme
 N_it=round(T/dt);
 if eq_type=="linear", velocity=1; Courant=dt*velocity/min(hx,hy); end
 if eq_type=="sphere", velocity=2*pi*radius/(12*86400); Courant=dt*velocity/(radius*min(hx,hy)); end

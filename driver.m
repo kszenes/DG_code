@@ -3,15 +3,31 @@ set(0,'defaultAxesFontSize',20); set(0,'defaultLineLineWidth',2);
 
 %equation type
 % eq_type="linear";
-eq_type="adv_sphere";
-
+% eq_type="adv_sphere";
 % eq_type="swe";
-% eq_type="swe_sphere";
+eq_type="swe_sphere";
 
+% plot_type = "surf";
+plot_type = "contour";
+% plot_type = "sphere";
+
+%plotting frequency
+if eq_type=="swe_sphere" || eq_type=="swe"
+    plot_freq=1;
+%     plot_type = "surf";
+elseif eq_type=="adv_sphere" || eq_type=="linear"
+    plot_type="contour";
+    plot_freq=100;
+else
+    plot_freq=100;
+end
+
+plot_freq=10;
 
 %definition of the domain [a,b]x[c,d]
 if eq_type == "linear" || eq_type == "swe"
     a=0; b=1; c=0; d=1;
+%     a=0; b=1e7; c=0; d=1e7;
 elseif eq_type == "adv_sphere"
 %     a=0; b=1e7; c=0; d=1e7;
     a=0; b=2*pi; c=-pi/2; d=pi/2;
@@ -41,9 +57,6 @@ dyn_adapt=false;
 % figure(1);
 % imagesc(1:d1,1:d2,flipud(r)); colormap jet; colorbar;
 
-
-
-
 %type of quadrature rule (Gauss-Legendre or Gauss-Legendre-Lobatto)
 quad_type="leg";
 
@@ -61,31 +74,28 @@ T=12*86400;
 %T=5*86400;
 
 %order of the RK scheme (1,2,3,4)
-RK=4; 
+RK=1; 
 
 %time step
 
 if eq_type == "linear"
     dt=1/r_max^2*min(hx,hy)*0.1; % LINEAR 
 elseif eq_type == "adv_sphere"
-    dt=500; % ADV SPHERE
+    dt=200; % ADV SPHERE
 elseif eq_type == "swe"
     dt=1/r_max^2*min(hx,hy)*0.0005; % SWE
 elseif eq_type == "swe_sphere"
-    if r_max == 2
-        dt = 2; % SWE SPHERE
-%         dt=1/r_max^2*min(hx,hy); % SWE
-    else
-        dt = 20;
-    end
+%     if r_max == 2
+%         dt = 2; % SWE SPHERE
+% %         dt=1/r_max^2*min(hx,hy); % SWE
+%     else
+%         dt = 20;
+        dt=1/r_max^2*min(hx,hy)*100; % SWE
+%     end
         
 end
 
-dt = 0.01; % SWE SPHERE
-
-
-%plotting frequency
-plot_freq=100;
+dt = 0.00001; % SWE SPHERE
 
 %beginning and end of the intervals
 x_e=linspace(a,b,d1+1); 
@@ -222,6 +232,8 @@ elseif eq_type=="swe"
 %initial condition (spherical linear advection) - specified as function
 elseif eq_type=="adv_sphere"
     th_c=0; lam_c=3/2*pi; h0=1000; 
+
+%     th_c=0; lam_c=pi/2; h0=1000000; 
     rr=@(lam,th) radius*acos(sin(th_c)*sin(th)+cos(th_c)*cos(th).*cos(lam-lam_c)); 
     u0_fun=@(lam,th) h0/2*(1+cos(pi*rr(lam,th)/radius)).*(rr(lam,th)<radius/3);
     
@@ -230,7 +242,7 @@ elseif eq_type=="adv_sphere"
     
 %initial condition (spherical swe) - specified as function
 elseif eq_type=="swe_sphere"
-    % g=9.80616; h0=2.94e4/g; Omega=7.292e-5; uu0=2*pi*radius/(12*86400); angle=0;
+%     g=9.80616; h0=2.94e4/g; Omega=7.292e-5; uu0=2*pi*radius/(12*86400); angle=0;
 %     h0_fun=@(lam,th) h0-1/g*(radius*Omega*uu0+uu0^2/2)*(sin(th)*cos(angle)-cos(lam).*cos(th)*sin(angle)).^2;
 %     v0x_fun=@(lam,th) uu0.*(cos(th)*cos(angle)+sin(th).*cos(lam)*sin(angle));
 %     v0y_fun=@(lam,th) -uu0.*sin(angle).*sin(lam);
@@ -244,7 +256,9 @@ elseif eq_type=="swe_sphere"
 %     coriolis_fun=@(lam,th) 2*Omega*(sin(th)*cos(angle)-cos(th).*cos(lam)*sin(angle));
     %------------- ---------------
     Omega=7.292e-5;
-    h0=1000; h1=100; Cx=a+(b-a)*1/2; Cy=c+(d-c)*1/2; sigma=(a+b)/20;
+    h0=1000; h1=100; Cx=a+(b-a)*3/4; Cy=c+(d-c)*3/4; sigma=(a+b)/20;
+%     h0=1e7; h1=1e3; Cx=a+(b-a)*1/2; Cy=c+(d-c)*1/2; sigma=(a+b)/20;
+
     h0_fun=@(x,y) h0+h1*exp(-((x-Cx).^2+(y-Cy).^2)/(2*sigma^2));
 
     v0x_fun=@(x,y) zeros(size(x));
@@ -262,7 +276,7 @@ elseif eq_type=="swe_sphere"
     %set coriolis function
     % coriolis_fun=@(x,y) zeros(size(x));
     % coriolis_fun=@(x,y) 1e-4*ones(size(x));
-    coriolis_fun=@(x,y) 2*Omega
+%     coriolis_fun=@(x,y) 2*Omega;
     
 end
 
@@ -273,19 +287,21 @@ if ~exist('coriolis_fun','var')
 end
 
 %do modal-nodal conversion check
-u0_check=modal2nodal(nodal2modal(u0(:,:,1),V,r),V,r);
-if max(max(abs(u0_check-u0(:,:,1))))>1e-10
-    error('Wrong modal-nodal conversion: %e\n',max(max(abs(u0_check-u0(:,:,1)))));
-end
+% u0_check=modal2nodal(nodal2modal(u0(:,:,1),V,r),V,r);
+% if max(max(abs(u0_check-u0(:,:,1))))>1e-10
+%     error('Wrong modal-nodal conversion: %e\n',max(max(abs(u0_check-u0(:,:,1)))));
+% end
 
 %visualize solution at initial time - only first component
 x_u=x_e(1:end-1)+(unif_visual+1)/2*hx;
 y_u=y_e(1:end-1)+(unif_visual+1)/2*hy;
 
 % PLOT INITIAL CONDITIONS
-% figure(2); 
-% plot_solution( modal2nodal(nodal2modal(u0(:,:,1),V,r),V_rect,r) ,x_u(:),y_u(:),n_qp_1D-1,d1,d2,"contour", eq_type, fact_int);
+% f1 = figure('units','normalized','outerposition',[0 0 1 1]);  
+% figure(f1);
+% plot_solution( modal2nodal(nodal2modal(u0(:,:,:),V,r),V_rect,r) ,x_u(:),y_u(:),n_qp_1D-1,d1,d2,radius,plot_type, "Intial Conditions", eq_type, fact_int);
 
+% return
 
 %convert nodal to modal: the vector u will contain the modal coefficient
 u=zeros(dim,d1*d2,size(u0,3)); 
@@ -316,6 +332,8 @@ N_it=ceil(T/dt);
 fprintf('Space discretization: order %d, elements=%d*%d, domain=[%f,%f]x[%f,%f]\n',r_max,d1,d2,a,b,c,d);
 fprintf('Time integration: order %d, T=%f, dt=%f, N_iter=%d\n',RK,T,dt,N_it);
 
+f2 = figure('units','normalized','outerposition',[0 0 1 1]);  
+figure(f2);
 %start temporal loop
 for iter=1:N_it
     
@@ -356,9 +374,10 @@ for iter=1:N_it
     %plot solution
     if (mod(iter-1,plot_freq)==0) || iter==N_it
         fprintf('Iteration %d/%d Time: %f\n',iter,N_it, iter*dt); 
-        figure(3);
+%         f2 = figure('units','normalized','outerposition',[0 0 1 1]);  
+%         figure(f2);
+        plot_solution( modal2nodal(u(:,:,:),V_rect,r) ,x_u(:),y_u(:),n_qp_1D-1,d1,d2,radius,plot_type, "Simulation", eq_type, fact_int);
         pause(0.05);
-        plot_solution( modal2nodal(u,V_rect,r) ,x_u(:),y_u(:),n_qp_1D-1,d1,d2,"contour", eq_type, fact_int);
     end
     
     %next iteration
@@ -369,19 +388,27 @@ for iter=1:N_it
     
     %avoid useless iterations if solution is already diverging
     if max(abs(u(:)))>=1e8
-        fprintf('Iteration %d/%d  Time: %f\n',i,N_it, i*dt); error('Solution is diverging'); 
+        fprintf('Iteration %d/%d  Time: %f\n',iter,N_it, iter*dt); error('Solution is diverging'); 
     end
     
 end
 
 %plot all components of the solution
-for i=1:size(u,3)
-    figure(200); 
-    plot_solution(modal2nodal(u(:,:,i),V_rect,r),x_u,y_u,n_qp_1D-1,d1,d2,"surf", eq_type, fact_int); 
-end
+% for i=1:size(u,3)
+%     figure(200); 
+%     plot_solution(modal2nodal(u(:,:,:),V_rect,r),x_u,y_u,n_qp_1D-1,d1,d2,plot_type, eq_type, fact_int); 
+% end
 
 %compute discretization error, assuming that solution did one complete rotation
 if eq_type=="linear" || eq_type=="adv_sphere"
+    f3 = figure('units','normalized','outerposition',[0 0 1 1]);  
+    figure(f3);
+%     f.Position = [10 10 1500 700]; 
+    error_plot = zeros(n_qp, d1*d2, 3);
+    error_plot(:,:,1) = modal2nodal(nodal2modal(u0(:,:,:),V,r),V_rect,r);
+    error_plot(:,:,2) = modal2nodal(u(:,:,:),V_rect,r);
+    error_plot(:,:,3) = modal2nodal(u(:,:,:),V_rect,r) - modal2nodal(nodal2modal(u0(:,:,:),V,r),V_rect,r);
+    plot_solution(error_plot,x_u(:),y_u(:),n_qp_1D-1,d1,d2,radius,plot_type,"Final timestep error", eq_type, fact_int);
     errL2=reshape(u(:,:,1)-nodal2modal(u0(:,:,1),V,r),dim*d1*d2,1)'*mass*reshape(u(:,:,1)-nodal2modal(u0(:,:,1),V,r),dim*d1*d2,1);
     normL2_sol=reshape(nodal2modal(u0(:,:,1),V,r),dim*d1*d2,1)'*mass*reshape(nodal2modal(u0(:,:,1),V,r),dim*d1*d2,1);
     fprintf('L2 error is %f, and after normalization is %f\n',sqrt(errL2),sqrt(errL2/normL2_sol));

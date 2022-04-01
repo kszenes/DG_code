@@ -29,10 +29,10 @@ end
 %det_internal*inverse_of_jacobian_x_affine*sum(dPhi/dr*f_x*weights)+
 % %det_internal*inverse_of_jacobian_y_affine*sum(dPhi/ds*f_y*weights)
 for i=1:size(u,3)
-    rhsu(:,:,i)=reshape(phi_grad{1}'*reshape(flux_fun_x(:,:,i).*wts2d,n_qp*d1*d2,1),dim,d1*d2)*(2/hx)*determ +...
-        reshape(phi_grad{2}'*reshape(fact_int.*flux_fun_y(:,:,i).*wts2d,n_qp*d1*d2,1),dim,d1*d2)*(2/hy)*determ;
 %     rhsu(:,:,i)=reshape(phi_grad{1}'*reshape(flux_fun_x(:,:,i).*wts2d,n_qp*d1*d2,1),dim,d1*d2)*(2/hx)*determ +...
-%         reshape(phi_grad{2}'*reshape(flux_fun_y(:,:,i).*wts2d,n_qp*d1*d2,1),dim,d1*d2)*(2/hy)*determ;
+%         reshape(phi_grad{2}'*reshape(fact_int.*flux_fun_y(:,:,i).*wts2d,n_qp*d1*d2,1),dim,d1*d2)*(2/hy)*determ;
+    rhsu(:,:,i)=reshape(phi_grad{1}'*reshape(flux_fun_x(:,:,i).*wts2d,n_qp*d1*d2,1),dim,d1*d2)*(2/hx)*determ +...
+        reshape(phi_grad{2}'*reshape(flux_fun_y(:,:,i).*wts2d,n_qp*d1*d2,1),dim,d1*d2)*(2/hy)*determ;
     %rhsu(:,:,i)=phi_grad(:,:,1)'*(flux_fun_x(:,:,i).*wts2d)*(2/hx)*determ +...
         %phi_grad(:,:,2)'*(fact_int.*flux_fun_y(:,:,i).*wts2d)*(2/hy)*determ;
 end
@@ -67,45 +67,34 @@ end
 %add corrective internal term for the divergence, only in spherical
 %coordinates for swe
 if eq_type=="swe_sphere"
-%     rhsu(:,:,2)=rhsu(:,:,2)+reshape(phi_val{1}'*reshape(complem_fact.*flux_fun_y(:,:,3).*wts2d,n_qp*d1*d2,1),dim,d1*d2)*determ;
-%     rhsu(:,:,3)=rhsu(:,:,3)-reshape(phi_val{1}'*reshape(complem_fact.*flux_fun_x(:,:,2).*wts2d,n_qp*d1*d2,1),dim,d1*d2)*determ;
+    rhsu(:,:,2)=rhsu(:,:,2)+reshape(phi_val{1}'*reshape(complem_fact./fact_int.*flux_fun_y(:,:,3).*wts2d,n_qp*d1*d2,1),dim,d1*d2)*determ;
+    rhsu(:,:,3)=rhsu(:,:,3)-reshape(phi_val{1}'*reshape(complem_fact./fact_int.*flux_fun_x(:,:,2).*wts2d,n_qp*d1*d2,1),dim,d1*d2)*determ;
     %rhsu(:,:,2)=rhsu(:,:,2)+phi_val'*(complem_fact.*flux_fun_y(:,:,2).*wts2d)*determ;
     %rhsu(:,:,3)=rhsu(:,:,3)-phi_val'*(complem_fact.*flux_fun_x(:,:,2).*wts2d)*determ;
 end
 
 
-g=9.80616;
 % source term
-if eq_type == "swe_sphere"
-%     rhsu(:,:,3) = rhsu(:,:,3) + u_qp(:,:,3) .* u_qp(:,:,3) ./ u_qp(:,:,1) .* complem_fact;
+% if eq_type == "swe_sphere"
+% %     rhsu(:,:,3) = rhsu(:,:,3) + u_qp(:,:,3) .* u_qp(:,:,3) ./ u_qp(:,:,1) .* complem_fact;
 %     rhsu(:,:,1)=rhsu(:,:,1) + reshape(phi_val{1}'*reshape(complem_fact./fact_int.*u_qp(:,:,3).*wts2d,n_qp*d1*d2,1),dim,d1*d2)*determ;
 %     rhsu(:,:,2)=rhsu(:,:,2) + reshape(phi_val{1}'*reshape(complem_fact./fact_int.*u_qp(:,:,2).*u_qp(:,:,3)./u_qp(:,:,1).*wts2d,n_qp*d1*d2,1),dim,d1*d2)*determ;
 %     rhsu(:,:,3)=rhsu(:,:,3) + reshape(phi_val{1}'*reshape(complem_fact./fact_int.*u_qp(:,:,3).*u_qp(:,:,3)./u_qp(:,:,1).*wts2d,n_qp*d1*d2,1),dim,d1*d2)*determ;
+% %     rhsu(:,:,1)=rhsu(:,:,1) + reshape(phi_val{1}'*reshape(complem_fact.*u_qp(:,:,3).*wts2d,n_qp*d1*d2,1),dim,d1*d2)*determ;
+% %     rhsu(:,:,2)=rhsu(:,:,2) + reshape(phi_val{1}'*reshape(complem_fact.*u_qp(:,:,2).*u_qp(:,:,3)./u_qp(:,:,1).*wts2d,n_qp*d1*d2,1),dim,d1*d2)*determ;
+% %     rhsu(:,:,3)=rhsu(:,:,3) + reshape(phi_val{1}'*reshape(complem_fact.*u_qp(:,:,3).*u_qp(:,:,3)./u_qp(:,:,1).*wts2d,n_qp*d1*d2,1),dim,d1*d2)*determ;
+% end
 
-    rhsu(:,:,3)=rhsu(:,:,3) - reshape(phi_val{1}'*reshape(complem_fact*0.5*g.*u_qp(:,:,1).^2.*wts2d,n_qp*d1*d2,1),dim,d1*d2)*determ;
-
-
-%     rhsu(:,:,1)=rhsu(:,:,1) + reshape(phi_val{1}'*reshape(complem_fact.*u_qp(:,:,3).*wts2d,n_qp*d1*d2,1),dim,d1*d2)*determ;
-%     rhsu(:,:,2)=rhsu(:,:,2) + reshape(phi_val{1}'*reshape(complem_fact.*u_qp(:,:,2).*u_qp(:,:,3)./u_qp(:,:,1).*wts2d,n_qp*d1*d2,1),dim,d1*d2)*determ;
-%     rhsu(:,:,3)=rhsu(:,:,3) + reshape(phi_val{1}'*reshape(complem_fact.*u_qp(:,:,3).*u_qp(:,:,3)./u_qp(:,:,1).*wts2d,n_qp*d1*d2,1),dim,d1*d2)*determ;
-end
-
-Omega=7.292e-5;
 %add coriolis term to second and third equation of the swe
-if eq_type=="swe" || eq_type=="swe_sphere"
+% if eq_type=="swe" || eq_type=="swe_sphere"
 %     coriolis=coriolis_fun(pts2d_phi(1:n_qp,:),pts2d_phi(n_qp+1:2*n_qp,:));
 %     rhsu(:,:,2)=rhsu(:,:,2)+radius*reshape(phi_val{1}'*reshape(complem_fact.*coriolis.*u_qp(:,:,3).*wts2d,n_qp*d1*d2,1),dim,d1*d2)*determ;
 %     rhsu(:,:,3)=rhsu(:,:,3)-radius*reshape(phi_val{1}'*reshape(complem_fact.*coriolis.*u_qp(:,:,2).*wts2d,n_qp*d1*d2,1),dim,d1*d2)*determ;
-    
-%     rhsu(:,:,2)=rhsu(:,:,2)+radius*reshape(phi_val{1}'*reshape(2*Omega*complem_fact.*fact_int.*u_qp(:,:,3).*wts2d,n_qp*d1*d2,1),dim,d1*d2)*determ;
-%     rhsu(:,:,3)=rhsu(:,:,3)-radius*reshape(phi_val{1}'*reshape(2*Omega*complem_fact.*fact_int.*u_qp(:,:,2).*wts2d,n_qp*d1*d2,1),dim,d1*d2)*determ;
-    
-    
-%     rhsu(:,:,2)=rhsu(:,:,2)+radius*reshape(phi_val{1}'*reshape(fact_int.*coriolis.*u_qp(:,:,3).*wts2d,n_qp*d1*d2,1),dim,d1*d2)*determ;
-%     rhsu(:,:,3)=rhsu(:,:,3)-radius*reshape(phi_val{1}'*reshape(fact_int.*coriolis.*u_qp(:,:,2).*wts2d,n_qp*d1*d2,1),dim,d1*d2)*determ;
-%     %rhsu(:,:,2)=rhsu(:,:,2)+radius*phi_val(:,:)'*(fact_int.*coriolis.*u_qp(:,:,3).*wts2d)*determ;
-% 	%rhsu(:,:,3)=rhsu(:,:,3)-radius*phi_val(:,:)'*(fact_int.*coriolis.*u_qp(:,:,2).*wts2d)*determ;
-end
+% %     rhsu(:,:,2)=rhsu(:,:,2)+radius*reshape(phi_val{1}'*reshape(fact_int.*coriolis.*u_qp(:,:,3).*wts2d,n_qp*d1*d2,1),dim,d1*d2)*determ;
+% %     rhsu(:,:,3)=rhsu(:,:,3)-radius*reshape(phi_val{1}'*reshape(fact_int.*coriolis.*u_qp(:,:,2).*wts2d,n_qp*d1*d2,1),dim,d1*d2)*determ;
+% %     %rhsu(:,:,2)=rhsu(:,:,2)+radius*phi_val(:,:)'*(fact_int.*coriolis.*u_qp(:,:,3).*wts2d)*determ;
+% % 	%rhsu(:,:,3)=rhsu(:,:,3)-radius*phi_val(:,:)'*(fact_int.*coriolis.*u_qp(:,:,2).*wts2d)*determ;
+% end
 
 %invert the (local) mass matrix and divide by radius
 for n=1:size(u,3)
