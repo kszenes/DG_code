@@ -90,15 +90,14 @@ if eq_type == "swe_sphere"
 %     rhsu(:,:,3)=rhsu(:,:,3) + reshape(phi_val{1}'*reshape(complem_fact.*u_qp(:,:,3).*u_qp(:,:,3)./u_qp(:,:,1).*wts2d,n_qp*d1*d2,1),dim,d1*d2)*determ;
 end
 
-Omega=7.292e-5;
 %add coriolis term to second and third equation of the swe
 if eq_type=="swe" || eq_type=="swe_sphere"
-%     coriolis=coriolis_fun(pts2d_phi(1:n_qp,:),pts2d_phi(n_qp+1:2*n_qp,:));
+    coriolis=coriolis_fun(pts2d_phi(1:n_qp,:),pts2d_phi(n_qp+1:2*n_qp,:));
 %     rhsu(:,:,2)=rhsu(:,:,2)+radius*reshape(phi_val{1}'*reshape(complem_fact.*coriolis.*u_qp(:,:,3).*wts2d,n_qp*d1*d2,1),dim,d1*d2)*determ;
 %     rhsu(:,:,3)=rhsu(:,:,3)-radius*reshape(phi_val{1}'*reshape(complem_fact.*coriolis.*u_qp(:,:,2).*wts2d,n_qp*d1*d2,1),dim,d1*d2)*determ;
     
-%     rhsu(:,:,2)=rhsu(:,:,2)+radius*reshape(phi_val{1}'*reshape(2*Omega*complem_fact.*fact_int.*u_qp(:,:,3).*wts2d,n_qp*d1*d2,1),dim,d1*d2)*determ;
-%     rhsu(:,:,3)=rhsu(:,:,3)-radius*reshape(phi_val{1}'*reshape(2*Omega*complem_fact.*fact_int.*u_qp(:,:,2).*wts2d,n_qp*d1*d2,1),dim,d1*d2)*determ;
+    rhsu(:,:,2)=rhsu(:,:,2)+radius*reshape(phi_val{1}'*reshape(coriolis.*fact_int.*u_qp(:,:,3).*wts2d,n_qp*d1*d2,1),dim,d1*d2)*determ;
+    rhsu(:,:,3)=rhsu(:,:,3)-radius*reshape(phi_val{1}'*reshape(coriolis.*fact_int.*u_qp(:,:,2).*wts2d,n_qp*d1*d2,1),dim,d1*d2)*determ;
     
     
 %     rhsu(:,:,2)=rhsu(:,:,2)+radius*reshape(phi_val{1}'*reshape(fact_int.*coriolis.*u_qp(:,:,3).*wts2d,n_qp*d1*d2,1),dim,d1*d2)*determ;

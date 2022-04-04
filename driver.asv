@@ -400,12 +400,9 @@ for iter=1:N_it
     if (mod(iter-1,plot_freq)==0) || iter==N_it
         t = iter*dt;
         fprintf('Iteration %d/%d Time: %f\n',iter,N_it, t); 
-        figure(f2);
-        plot_solution( modal2nodal(u(:,:,:),V_rect,r) ,x_u(:),y_u(:), ...
-            n_qp_1D-1,d1,d2,radius,plot_type, ...
-            sprintf("Simulation: T = %.1f sec (%.2f h)", t, t/3600), ...
-            eq_type, fact_int);
-%         pause(0.05);
+        figure(
+        plot_solution( modal2nodal(u(:,:,:),V_rect,r) ,x_u(:),y_u(:),n_qp_1D-1,d1,d2,radius,plot_type, sprintf("Simulation: T = %.1f sec", t), eq_type, fact_int);
+        pause(0.05);
     end
     
     %next iteration

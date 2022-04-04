@@ -23,7 +23,7 @@ for n=1:neq
           hh=surf(X,Y,u_plot'); set(hh,'edgecolor','none'); colormap jet; colorbar; shading interp;
     elseif plot_type=="sphere"
         grid = mesh(u_plot);
-        hold all;
+%         hold all;
         [x,y,z] = sphere(size(u_plot,1)-1);
         surf(x*radius, y*radius, z*radius+u_plot')
         drawnow
