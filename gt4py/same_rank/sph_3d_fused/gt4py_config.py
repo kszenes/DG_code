@@ -51,3 +51,9 @@ else:
         "verbose": True,
         "_validate_args": False
     }
+
+externals = {
+    "DIM": dim,
+    "N_QP": n_qp,
+    "N_QP_1D": n_qp_1D
+}

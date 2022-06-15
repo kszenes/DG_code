@@ -115,7 +115,7 @@ def compute_rhs(
             hv_e, hv_e, hv_w, hv_w,
             origin=origins_pbc, domain=(1, ny, nz)
         )
-        # NOTE: north/south pbc not stricly necessary
+        # NOTE: north/south pbc not stricly necessary (could simply change domain)
         stencils.apply_pbc_south(
             h_n, h_n, h_s, h_s,
             hu_n, hu_n, hu_s, hu_s,
