@@ -1,5 +1,7 @@
 import gt4py.gtscript as gtscript
-from gt4py_config import dtype, backend, backend_opts, dim, n_qp, n_qp_1D
+from gt4py_config import dtype, backend, backend_opts, dim, n_qp, n_qp_1D, externals
+import numpy as np
+from gt4py.gtscript import Field
 
 @gtscript.stencil(backend=backend, **backend_opts)
 def modal2nodal(
@@ -9,7 +11,8 @@ def modal2nodal(
 ):
     with computation(PARALLEL), interval(...):
         u_nodal = phi @ u_modal
-@gtscript.stencil(backend=backend, **backend_opts)
+
+@gtscript.stencil(backend=backend, externals=externals, **backend_opts)
 def fused_internal_stencils(
     phi: gtscript.Field[gtscript.K, (dtype, (n_qp, dim))],
 
@@ -67,6 +70,8 @@ def fused_internal_stencils(
     hv_e: gtscript.Field[(dtype, (n_qp_1D,))],
     hv_w: gtscript.Field[(dtype, (n_qp_1D,))]
 ):
+    from __externals__ import DIM, N_QP, N_QP_1D
+    # h_qp_tmp: Field[(np.float64, (1,))] = 0
     with computation(PARALLEL), interval(...):
         # Flux Stencil
         h_qp = phi @ h
