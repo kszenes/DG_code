@@ -1,0 +1,13 @@
+configuration==0.4.2
+cupy==10.5.0
+cupy_cuda110==10.4.0
+dace==0.13.1
+element==0.1
+functions==0.7.0
+matplotlib==3.5.1
+pandas==1.2.4
+plotly==5.7.0
+pytest==0.0.0
+quadpy==0.16.14
+scalene==1.5.8
+scipy==1.6.2
