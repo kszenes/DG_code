@@ -71,31 +71,41 @@ def fused_internal_stencils(
     hv_w: gtscript.Field[(dtype, (n_qp_1D,))]
 ):
     from __externals__ import DIM, N_QP, N_QP_1D
-    # h_qp_tmp: Field[(np.float64, (1,))] = 0
+    
+    h_qp_tmp: Field[(np.float64, (16,))] = 0
+    hu_qp_tmp: Field[(np.float64, (16,))] = 0
+    hv_qp_tmp: Field[(np.float64, (16,))] = 0
+
+    fh_x_tmp: Field[(np.float64, (16,))] = 0
+    fh_y_tmp: Field[(np.float64, (16,))] = 0
+    fhu_x_tmp: Field[(np.float64, (16,))] = 0
+    fhu_y_tmp: Field[(np.float64, (16,))] = 0
+    fhv_x_tmp: Field[(np.float64, (16,))] = 0
+    fhv_y_tmp: Field[(np.float64, (16,))] = 0
     with computation(PARALLEL), interval(...):
         # Flux Stencil
-        h_qp = phi @ h
-        hu_qp = phi @ hu
-        hv_qp = phi @ hv
+        h_qp_tmp = phi @ h
+        hu_qp_tmp = phi @ hu
+        hv_qp_tmp = phi @ hv
 
-        fh_x = hu_qp
-        fh_y = hv_qp
+        fh_x_tmp = hu_qp_tmp
+        fh_y_tmp = hv_qp_tmp
 
-        fhu_x = hu_qp * hu_qp / h_qp + h_qp * h_qp * g / 2
-        fhu_y = hu_qp * hv_qp / h_qp
+        fhu_x_tmp = hu_qp_tmp * hu_qp_tmp / h_qp_tmp + h_qp_tmp * h_qp_tmp * g / 2
+        fhu_y_tmp = hu_qp_tmp * hv_qp_tmp / h_qp_tmp
 
-        fhv_x = hu_qp * hv_qp / h_qp
-        fhv_y = hv_qp * hv_qp / h_qp + h_qp * h_qp * g / 2
+        fhv_x_tmp = hu_qp_tmp * hv_qp_tmp / h_qp_tmp
+        fhv_y_tmp = hv_qp_tmp * hv_qp_tmp / h_qp_tmp + h_qp_tmp * h_qp_tmp * g / 2
 
-        rhs_h = (phi_grad_x.T @ (fh_x * w) / bd_det_x + phi_grad_y.T @ (fh_y * w * cos_fact) / bd_det_y) * determ
-        rhs_hu = (phi_grad_x.T @ (fhu_x * w) / bd_det_x + phi_grad_y.T @ (fhu_y * w * cos_fact) / bd_det_y) * determ
-        rhs_hv = (phi_grad_x.T @ (fhv_x * w) / bd_det_x + phi_grad_y.T @ (fhv_y * w * cos_fact) / bd_det_y) * determ
+        rhs_h = (phi_grad_x.T @ (fh_x_tmp * w) / bd_det_x + phi_grad_y.T @ (fh_y_tmp * w * cos_fact) / bd_det_y) * determ
+        rhs_hu = (phi_grad_x.T @ (fhu_x_tmp * w) / bd_det_x + phi_grad_y.T @ (fhu_y_tmp * w * cos_fact) / bd_det_y) * determ
+        rhs_hv = (phi_grad_x.T @ (fhv_x_tmp * w) / bd_det_x + phi_grad_y.T @ (fhv_y_tmp * w * cos_fact) / bd_det_y) * determ
 
         # Source Stencil
-        rhs_hv -= (phi.T @ (0.5 * g * sin_fact * h_qp *h_qp * w)) * determ
+        rhs_hv -= (phi.T @ (0.5 * g * sin_fact * h_qp_tmp *h_qp_tmp * w)) * determ
         # Coriolis
-        rhs_hu += (phi.T @ (coriolis * cos_fact * hv_qp * w)) * radius * determ
-        rhs_hv -= (phi.T @ (coriolis * cos_fact * hu_qp * w)) * radius * determ
+        rhs_hu += (phi.T @ (coriolis * cos_fact * hv_qp_tmp * w)) * radius * determ
+        rhs_hv -= (phi.T @ (coriolis * cos_fact * hu_qp_tmp * w)) * radius * determ
 
         # Boundary
         h_n = phi_bd_N @ h
@@ -311,47 +321,65 @@ def fused_num_flux(
     inv_mass: gtscript.Field[gtscript.J, (dtype, (dim, dim))],
     radius: float
 ):
+    flux_n_h_tmp: Field[(np.float64, (4,))] = 0
+    flux_s_h_tmp: Field[(np.float64, (4,))] = 0
+    flux_e_h_tmp: Field[(np.float64, (4,))] = 0
+    flux_w_h_tmp: Field[(np.float64, (4,))] = 0
+
+    flux_n_hu_tmp: Field[(np.float64, (4,))] = 0
+    flux_s_hu_tmp: Field[(np.float64, (4,))] = 0
+    flux_e_hu_tmp: Field[(np.float64, (4,))] = 0
+    flux_w_hu_tmp: Field[(np.float64, (4,))] = 0
+
+    flux_n_hv_tmp: Field[(np.float64, (4,))] = 0
+    flux_s_hv_tmp: Field[(np.float64, (4,))] = 0
+    flux_e_hv_tmp: Field[(np.float64, (4,))] = 0
+    flux_w_hv_tmp: Field[(np.float64, (4,))] = 0
+
+    tmp_h: Field[(np.float64, (16,))] = 0
+    tmp_hu: Field[(np.float64, (16,))] = 0
+    tmp_hv: Field[(np.float64, (16,))] = 0
     with computation(PARALLEL), interval(...):
         # --- Num Flux ---
-        flux_n_h = cos_n * (0.5 * (f_n_h + f_s_h[0,+1,0]) - (h_s[0,+1,0] - h_n) * 0.5 * alpha)
-        flux_s_h = cos_s * (-0.5 * (f_s_h + f_n_h[0,-1,0]) - (h_n[0,-1,0] - h_s) * 0.5 * alpha)
-        flux_e_h = 0.5 * (f_e_h + f_w_h[+1,0,0]) - (h_w[+1,0,0] - h_e) * 0.5 * alpha
-        flux_w_h = -0.5 * (f_w_h + f_e_h[-1,0,0]) -  (h_e[-1,0,0] - h_w) * 0.5 * alpha
+        flux_n_h_tmp = cos_n * (0.5 * (f_n_h + f_s_h[0,+1,0]) - (h_s[0,+1,0] - h_n) * 0.5 * alpha)
+        flux_s_h_tmp = cos_s * (-0.5 * (f_s_h + f_n_h[0,-1,0]) - (h_n[0,-1,0] - h_s) * 0.5 * alpha)
+        flux_e_h_tmp = 0.5 * (f_e_h + f_w_h[+1,0,0]) - (h_w[+1,0,0] - h_e) * 0.5 * alpha
+        flux_w_h_tmp = -0.5 * (f_w_h + f_e_h[-1,0,0]) -  (h_e[-1,0,0] - h_w) * 0.5 * alpha
 
-        flux_n_hu = cos_n * (0.5 * (f_n_hu + f_s_hu[0,+1,0]) - (hu_s[0,+1,0] - hu_n) * 0.5 * alpha)
-        flux_s_hu = cos_s * (-0.5 * (f_s_hu + f_n_hu[0,-1,0]) - (hu_n[0,-1,0] - hu_s) * 0.5 * alpha)
-        flux_e_hu = 0.5 * (f_e_hu + f_w_hu[+1,0,0]) - (hu_w[+1,0,0] - hu_e) * 0.5 * alpha
-        flux_w_hu = -0.5 * (f_w_hu + f_e_hu[-1,0,0]) -  (hu_e[-1,0,0] - hu_w) * 0.5 * alpha
+        flux_n_hu_tmp = cos_n * (0.5 * (f_n_hu + f_s_hu[0,+1,0]) - (hu_s[0,+1,0] - hu_n) * 0.5 * alpha)
+        flux_s_hu_tmp = cos_s * (-0.5 * (f_s_hu + f_n_hu[0,-1,0]) - (hu_n[0,-1,0] - hu_s) * 0.5 * alpha)
+        flux_e_hu_tmp = 0.5 * (f_e_hu + f_w_hu[+1,0,0]) - (hu_w[+1,0,0] - hu_e) * 0.5 * alpha
+        flux_w_hu_tmp = -0.5 * (f_w_hu + f_e_hu[-1,0,0]) -  (hu_e[-1,0,0] - hu_w) * 0.5 * alpha
 
-        flux_n_hv = cos_n * (0.5 * (f_n_hv + f_s_hv[0,+1,0]) - (hv_s[0,+1,0] - hv_n) * 0.5 * alpha)
-        flux_s_hv = cos_s * (-0.5 * (f_s_hv + f_n_hv[0,-1,0]) - (hv_n[0,-1,0] - hv_s) * 0.5 * alpha)
-        flux_e_hv = 0.5 * (f_e_hv + f_w_hv[+1,0,0]) - (hv_w[+1,0,0] - hv_e) * 0.5 * alpha
-        flux_w_hv = -0.5 * (f_w_hv + f_e_hv[-1,0,0]) -  (hv_e[-1,0,0] - hv_w) * 0.5 * alpha
+        flux_n_hv_tmp = cos_n * (0.5 * (f_n_hv + f_s_hv[0,+1,0]) - (hv_s[0,+1,0] - hv_n) * 0.5 * alpha)
+        flux_s_hv_tmp = cos_s * (-0.5 * (f_s_hv + f_n_hv[0,-1,0]) - (hv_n[0,-1,0] - hv_s) * 0.5 * alpha)
+        flux_e_hv_tmp = 0.5 * (f_e_hv + f_w_hv[+1,0,0]) - (hv_w[+1,0,0] - hv_e) * 0.5 * alpha
+        flux_w_hv_tmp = -0.5 * (f_w_hv + f_e_hv[-1,0,0]) -  (hv_e[-1,0,0] - hv_w) * 0.5 * alpha
 
         # --- Integrate Num Flux ---
-        rhs_h -= (phi_bd_N.T @ (flux_n_h * w)) * bd_det_x
-        rhs_h -= (phi_bd_S.T @ (flux_s_h * w)) * bd_det_x
-        rhs_h -= (phi_bd_E.T @ (flux_e_h * w)) * bd_det_y
-        rhs_h -= (phi_bd_W.T @ (flux_w_h * w)) * bd_det_y
+        rhs_h -= (phi_bd_N.T @ (flux_n_h_tmp * w)) * bd_det_x
+        rhs_h -= (phi_bd_S.T @ (flux_s_h_tmp * w)) * bd_det_x
+        rhs_h -= (phi_bd_E.T @ (flux_e_h_tmp * w)) * bd_det_y
+        rhs_h -= (phi_bd_W.T @ (flux_w_h_tmp * w)) * bd_det_y
 
-        rhs_hu -= (phi_bd_N.T @ (flux_n_hu * w)) * bd_det_x
-        rhs_hu -= (phi_bd_S.T @ (flux_s_hu * w)) * bd_det_x
-        rhs_hu -= (phi_bd_E.T @ (flux_e_hu * w)) * bd_det_y
-        rhs_hu -= (phi_bd_W.T @ (flux_w_hu * w)) * bd_det_y
+        rhs_hu -= (phi_bd_N.T @ (flux_n_hu_tmp * w)) * bd_det_x
+        rhs_hu -= (phi_bd_S.T @ (flux_s_hu_tmp * w)) * bd_det_x
+        rhs_hu -= (phi_bd_E.T @ (flux_e_hu_tmp * w)) * bd_det_y
+        rhs_hu -= (phi_bd_W.T @ (flux_w_hu_tmp * w)) * bd_det_y
 
-        rhs_hv -= (phi_bd_N.T @ (flux_n_hv * w)) * bd_det_x
-        rhs_hv -= (phi_bd_S.T @ (flux_s_hv * w)) * bd_det_x
-        rhs_hv -= (phi_bd_E.T @ (flux_e_hv * w)) * bd_det_y
-        rhs_hv -= (phi_bd_W.T @ (flux_w_hv * w)) * bd_det_y
+        rhs_hv -= (phi_bd_N.T @ (flux_n_hv_tmp * w)) * bd_det_x
+        rhs_hv -= (phi_bd_S.T @ (flux_s_hv_tmp * w)) * bd_det_x
+        rhs_hv -= (phi_bd_E.T @ (flux_e_hv_tmp * w)) * bd_det_y
+        rhs_hv -= (phi_bd_W.T @ (flux_w_hv_tmp * w)) * bd_det_y
 
         # --- Inv Mass ---
         # f_n_h(u/v) used as tmp
-        tmp = (inv_mass @ rhs_h) / radius
-        rhs_h = tmp
-        tmp = (inv_mass @ rhs_hu) / radius
-        rhs_hu = tmp
-        tmp = (inv_mass @ rhs_hv) / radius
-        rhs_hv = tmp
+        tmp_h = (inv_mass @ rhs_h) / radius
+        rhs_h = tmp_h
+        tmp_hu = (inv_mass @ rhs_hu) / radius
+        rhs_hu = tmp_hu
+        tmp_hv = (inv_mass @ rhs_hv) / radius
+        rhs_hv = tmp_hv
 
 @gtscript.stencil(backend=backend, **backend_opts)
 def compute_num_flux(
