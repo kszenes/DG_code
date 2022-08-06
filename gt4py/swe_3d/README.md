@@ -1,5 +1,5 @@
 # Problem
-This directory contains files related to our DG solver for the 2D planar Shallow Water Equations:
+This directory contains files related to our DG solver for the planar Shallow Water Equations:
 
 $$
 \begin{cases}
