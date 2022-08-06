@@ -8,17 +8,22 @@ $$
 
 # Usage
 ```
-Usage:
-    python main.py n p rk backend
-  
-Arguments:
-    n              The number of elements used for both the x and y directions
-    p              The polynomial degree (leads to a p+1 order method in space)
-    rk             The order of Runge Kutta method
-    backend        The name of the desired backend
-  
+Usage: main.py [-h] [-n] [-p] [-rk] [-b] [--perf]
+
+CLI tool for running DG scheme on the Linear Advection Problem
+
+Options:
+  -h, --help  show this help message and exit
+  -n          The number of elements used for both horizontal directions
+              (default: 20)
+  -p          The polynomial degree (leads to a p+1 order method in space)
+              (default: 0)
+  -rk         The order of Runge Kutta method (default: 1)
+  -b          The name of the desired backend (default: numpy)
+  --perf      Disables all output including plotting (used for performance
+              benchmarking) (default: False)
 Example:
-    python main.py 20 3 4 numpy
+    python main.py -n 20 -p 0 -rk 1 -b numpy --perf
 ```
 
 # Demo
