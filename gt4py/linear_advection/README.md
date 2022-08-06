@@ -23,7 +23,7 @@ Options:
   --perf      Disables all output including plotting (used for performance
               benchmarking) (default: False)
 Example:
-    python main.py -n 20 -p 0 -rk 1 -b numpy --perf
+  python main.py -n 20 -p 0 -rk 1 -b numpy --perf
 ```
 
 # Demo
