@@ -2,7 +2,7 @@ import numpy as np
 import time
 import gt4py as gt
 
-from gt4py_config import dtype, backend, runge_kutta
+from gt4py_config import dtype, backend, runge_kutta, perf_flag
 
 import stencils
 from compute_rhs import compute_rhs
@@ -326,16 +326,17 @@ def run(uM_gt, vander, inv_mass, wts2d, wts1d, dim, n_qp1d, n_qp2d, hx, hy, nx, 
             stencils.rk_step2_4(k1_hv, k2_hv, k3_hv, k4_hv, hv, dt, hv)
 
         # --- Output --- 
-        if i % plot_freq == 0:
+        if i % plot_freq == 0 and not perf_flag:
             print(f'Iteration {i}: time = {dt*i:.1f}s ({dt*i/3600:.1f} {dt*i/86400 :.1f} days)')
-            # k1_* serves as temps
+            # k1_{} serves as a temporary
             stencils.modal2nodal(vander.vander_gt, h, k1_h)
+            stencils.modal2nodal(vander.vander_gt, hu, k1_hu)
+            stencils.modal2nodal(vander.vander_gt, hv, k1_hv)
+
+            # Monitor divergence of solution
             if np.max(np.abs(k1_h)) > 1e8:
                 raise Exception('Solution diverging')
 
-            stencils.modal2nodal(vander.vander_gt, hu, k1_hu)
-            stencils.modal2nodal(vander.vander_gt, hv, k1_hv)
-            print('plotting')
             plotter.plot_solution((k1_h, k1_hu, k1_hv), title=f'{i * dt:.1f}s ({i * dt / 3600:.1f} h {i * dt / 86400:.1f} days)', fname=f'simulation_{dt*i}')
 
     loop_end = time.perf_counter()

@@ -110,7 +110,7 @@ print(f'Diffusion constanc: {alpha = }')
 print(f'Order: space {r+1}; time {runge_kutta}')
 
 
-run(u0_modal_gt, vander, inv_mass_gt, wts2d_gt, wts1d_gt, dim, n_qp_1D, n_qp, hx, hy, nx, ny, alpha, dt, niter, plotter, mass)
+run(u0_modal_gt, vander, inv_mass_gt, wts2d_gt, wts1d_gt, dim, n_qp_1D, n_qp, hx, hy, nx, ny, alpha, dt, niter, plotter)
 
 u_final_nodal = modal2nodal_gt(vander.phi_gt, u0_modal_gt)
 
@@ -138,4 +138,4 @@ l2_error = np.sqrt(np.einsum('ijkl, ijkl', (u0_m - u0_modal_gt), np.einsum('ijkl
 print(f'L2 error: Absolute {l2_error}; Relative {l2_error / initial_mass}\n')
 
 # Plot final time
-# plotter.plot_solution(u_final_nodal, fname='final_timestep')
+plotter.plot_solution(u_final_nodal, fname='final_timestep')

@@ -1,15 +1,13 @@
 import numpy as np
 import time
-import gt4py.gtscript as gtscript
 import gt4py as gt
 
-from gt4py_config import dtype, backend, backend_opts, runge_kutta, perf_flag
+from gt4py_config import dtype, backend,  runge_kutta, perf_flag
 
 import stencils
-import boundary_conditions
 from compute_rhs import compute_rhs
 
-def run(uM_gt, vander, inv_mass, wts2d, wts1d, dim, n_qp1d, n_qp2d, hx, hy, nx, ny, alpha, dt, niter, plotter, mass):
+def run(uM_gt, vander, inv_mass, wts2d, wts1d, dim, n_qp1d, n_qp2d, hx, hy, nx, ny, alpha, dt, niter, plotter):
     determ = hx * hy / 4
     bd_det_x = hx / 2
     bd_det_y = hy / 2

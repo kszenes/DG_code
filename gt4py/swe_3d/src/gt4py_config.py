@@ -1,30 +1,5 @@
 import numpy as np
-import sys
-
-if len(sys.argv) == 6:
-    _, nx, nz, r, runge_kutta, backend = sys.argv
-    nx = int(nx)
-    nz = int(nz)
-    r = int(r)
-    runge_kutta = int(runge_kutta)
-    if backend == 'cpu':
-        backend ="gt:cpu_ifirst" 
-else:
-    # === BACKENDS ===
-    backend = "numpy"
-    # backend ="gt:cpu_ifirst" 
-    # backend ="gt:cpu_kfirst" 
-    # backend = "dace:cpu"
-    # backend = "cuda"
-
-    # === ORDER ===
-    # spatial rank
-    r = 2
-    # runge-kutta
-    runge_kutta = 1
-    
-    nx = 20
-    nz = 1
+from cli_parser import nx, nz, r, runge_kutta, backend, perf_flag
 
 n_qp_1D = r+1
 dim=(r+1)**2
@@ -40,13 +15,7 @@ dtype_qp_vec = (dtype, (n_qp,))
 dtype_bd_vec = (dtype, (n_qp_1D,))
 dtype_modal_vec = (dtype, (dim,))
 
-if backend == 'numpy':
-    backend_opts = {
-        "rebuild": False,
-    }
-else:
-    backend_opts = {
-        "rebuild": False,
-        "verbose": True,
-        "_validate_args": False
-    }
+backend_opts = {
+    "rebuild": False,
+    "verbose": True,
+}

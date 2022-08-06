@@ -10,12 +10,10 @@ from modal_conversion import nodal2modal_gt, modal2nodal_gt, integration
 from compute_mass import compute_mass
 from run import run
 from plotter import Plotter
-from gt4py_config import backend, dtype, r, n_qp_1D, runge_kutta, nx, nz
+from gt4py_config import backend, dtype, r, n_qp_1D, runge_kutta, nx, nz, perf_flag
 
 # silence warning
 np.warnings.filterwarnings('ignore', category=np.VisibleDeprecationWarning)
-
-debug = False
 
 # %%
 # domain
@@ -95,7 +93,8 @@ hv0_nodal_gt = gt.storage.from_array(data=v0*h0,
     backend=backend, default_origin=(0,0,0), shape=(nx,ny,nz), dtype=(dtype, (dim,)))
 
 plotter = Plotter(x_c, y_c, r+1, nx, ny, neq, hx, hy, plot_freq)
-plotter.plot_solution(h0_nodal_gt, fname='init')
+if not perf_flag:
+    plotter.plot_solution(h0_nodal_gt, fname='init')
 
 h0_ref = nodal2modal_gt(vander.inv_vander_gt, h0_nodal_gt)
 h0_modal_gt = nodal2modal_gt(vander.inv_vander_gt, h0_nodal_gt)
@@ -130,10 +129,4 @@ u_final = np.asarray(u_final_nodal)
 # Timinig
 print(f'Vander: {vander_end - vander_start}s')
 
-# Plot final time
-if debug:
-    init = True
-else:
-    init = False
-
-# plotter.plot_solution(u_final_nodal, fname='final_timestep')
+plotter.plot_solution(u_final_nodal, fname='final_timestep')

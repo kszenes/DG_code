@@ -9,7 +9,7 @@ from initial_conditions import set_initial_conditions
 from compute_mass import compute_mass
 from run import run
 from plotter import Plotter
-from gt4py_config import backend, dtype, r, n_qp_1D, runge_kutta, nx, nz
+from gt4py_config import backend, dtype, r, n_qp_1D, runge_kutta, nx, nz, perf_flag
 
 from stencils import modal2nodal
 # silence warning
@@ -127,7 +127,8 @@ modal2nodal(vander.inv_vander_gt, hu0_nodal_gt, hu0_modal_gt)
 modal2nodal(vander.inv_vander_gt, hv0_nodal_gt, hv0_modal_gt)
 
 # --- Plot Initial conditions ---
-# plotter.plot_solution((h0_nodal_gt, hu0_nodal_gt, hv0_nodal_gt), fname='init.png')
+if not perf_flag:
+    plotter.plot_solution((h0_nodal_gt, hu0_nodal_gt, hv0_nodal_gt), fname='init.png')
 
 mass, inv_mass, cos_factor, sin_factor, cos_n, cos_s = compute_mass(vander.phi_val_cell, wts2d, ny, r, hx, hy, y_c, pts2d_y)
 
@@ -161,7 +162,8 @@ print(f'Diffusion constant flux: {alpha = }')
 run(
     (h0_modal_gt, hu0_modal_gt, hv0_modal_gt), vander, inv_mass_gt,
     wts2d_gt, wts1d_gt, dim, n_qp_1D, n_qp, hx, hy, nx, ny, nz,
-    cos_gt, sin_gt, (cos_n_gt, cos_s_gt), coriolis_gt, radius, alpha, dt, niter, plotter)
+    cos_gt, sin_gt, (cos_n_gt, cos_s_gt), coriolis_gt, radius, alpha, dt, niter, plotter
+)
 
 # Timinig
 print(f'Vander: {vander_end - vander_start}s')
@@ -180,4 +182,4 @@ h_f  =  np.asarray(h0_nodal_gt)
 hu_f = np.asarray(hu0_nodal_gt)
 hv_f = np.asarray(hv0_nodal_gt)
 
-# plotter.plot_solution((h_f, hu_f, hv_f), title=f'{nx = }; {nz = } | {r = }; {runge_kutta = } | {dt = :.1f}; {niter = } | {backend = }', fname=f'nx{nx}_nz{nz}_p{r+1}_rk{runge_kutta}_T{int(dt*niter)}_{backend}.png)
+plotter.plot_solution((h_f, hu_f, hv_f), title=f'{nx = }; {nz = } | {r = }; {runge_kutta = } | {dt = :.1f}; {niter = } | {backend = }', fname=f'nx{nx}_nz{nz}_p{r+1}_rk{runge_kutta}_T{int(dt*niter)}_{backend}.png')

@@ -2,7 +2,7 @@ import numpy as np
 import time
 import gt4py as gt
 
-from gt4py_config import dtype, backend, runge_kutta
+from gt4py_config import dtype, backend, runge_kutta, perf_flag
 
 import stencils
 from compute_rhs import compute_rhs
@@ -320,10 +320,9 @@ def run(uM_gt, vander, inv_mass, wts2d, wts1d, dim, n_qp1d, n_qp2d, hx, hy, nx, 
             stencils.rk_step2_4(k1_hv, k2_hv, k3_hv, k4_hv, hv, dt, hv)
 
         # --- Output --- 
-        if i % plot_freq == 0:
+        if i % plot_freq == 0 and not perf_flag:
             print(f'Iteration {i}: time = {dt*i}s done')
             stencils.modal2nodal(vander.vander_gt, h, u_nodal)
-            print('plotting')
             plotter.plot_solution(u_nodal, fname=f'simulation_{dt*i}')
 
     loop_end = time.perf_counter()
