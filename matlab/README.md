@@ -1,7 +1,7 @@
 # DGMG
 ### Created by: Niccolò Discacciati (EPFL, Lausanne) 
 ### Edited by: Kalman Szenes (ETH, Zurich)
-### Code available at: 
+### Original code available at: 
 `"https://github.com/nickdisca/DG_code/Old version"`             
 
 ### Date: 11 October, 2019
