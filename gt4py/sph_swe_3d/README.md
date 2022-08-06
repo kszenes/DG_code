@@ -28,7 +28,7 @@ Options:
   --perf      Disables all output including plotting (used for performance
               benchmarking) (default: False)
 Example:
-    python main.py -nx 20 -nz 1 -p 3 -rk 4 numpy --perf
+  python main.py -nx 20 -nz 1 -p 3 -rk 4 numpy --perf
 ```
 
 # Demo
