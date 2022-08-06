@@ -11,18 +11,23 @@ $$
 
 # Usage
 ```
-Usage:
-    python main.py n z_levels p rk backend
-  
-Arguments:
-    n               The number of elements used for both horizontal directions
-    z_levels        The number of identical vertical levels
-    p               The polynomial degree (leads to a p+1 order method in space)
-    rk              The order of Runge Kutta method
-    backend         The name of the desired backend
-  
+Usage: main.py [-h] [-nx] [-nz] [-p] [-rk] [-b] [--perf]
+
+CLI tool for running DG scheme on the planar Shallow Water Equations
+
+Options:
+  -h, --help  show this help message and exit
+  -nx         The number of elements used for both horizontal directions
+              (default: 20)
+  -nz         The number of identical vertical levels (default: 1)
+  -p          The polynomial degree (leads to a p+1 order method in space)
+              (default: 0)
+  -rk         The order of Runge Kutta method (default: 1)
+  -b          The name of the desired backend (default: numpy)
+  --perf      Disables all output including plotting (used for performance
+              benchmarking) (default: False)
 Example:
-    python main.py 20 1 3 4 numpy
+  python main.py -nx 20 -nz 1 -p 3 -rk 4 -b numpy --perf
 ```
 
 
