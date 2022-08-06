@@ -16,7 +16,7 @@ Usage:
     python main.py n z_levels p rk backend
   
 Arguments:
-    n              The number of elements used for both the x and y directions
+    n               The number of elements used for both horizontal directions
     z_levels        The number of identical vertical levels
     p               The polynomial degree (leads to a p+1 order method in space)
     rk              The order of Runge Kutta method
@@ -31,6 +31,6 @@ Example:
 The following figure illustrates an 8-day simulation of the Rossby-Haurwitz wave (Williamson et al., [1992](https://doi.org/10.1016/S0021-9991(05)80016-6)) using our 4th order DG scheme.
 Each plot depicts the evolution of variable, namely the water height and longitudinal and latitudinal velocities.
 
-![Rossby-Haurwitz wave](https://user-images.githubusercontent.com/58524567/183117994-13e4c36b-0ffe-4a3f-8241-4acef8ed4859.gif)
-
-
+<p align="center">
+  <img width="700" src="https://user-images.githubusercontent.com/58524567/183117994-13e4c36b-0ffe-4a3f-8241-4acef8ed4859.gif">
+</p>
