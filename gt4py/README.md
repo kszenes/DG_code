@@ -1,6 +1,7 @@
 # Configuration
 Each simulation has number of configurations that can be specified.
-They are found inside the respective `main.py` file for each problem directory.
+The most significant ones are defined using the CLI tool however some are also found inside the respective `main.py` file for each problem.
+They are listed below:
 
 - `a, b, c, d`: the domain size (relevant for Linear Advection and planar SWE as the spherical geometry fixes these values for the SWE on the sphere)
 - `ic_type`: initial conditions defined in `{problem}/initial_conditions.py` (planar SWE only comes with one initial condition)
