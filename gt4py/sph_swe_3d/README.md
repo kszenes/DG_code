@@ -10,22 +10,27 @@ $$
     \end{cases}
 $$
 
+# Usage
+```
+Usage:
+    python main.py n z_levels p rk backend
+  
+Arguments:
+    n               The number of elements used for both horizontal directions
+    z_levels        The number of identical vertical levels
+    p               The polynomial degree (leads to a p+1 order method in space)
+    rk              The order of Runge Kutta method
+    backend         The name of the desired backend
+  
+Example:
+    python main.py 20 1 3 4 numpy
+```
+
 # Demo
 
 The following figure illustrates an 8-day simulation of the Rossby-Haurwitz wave (Williamson et al., [1992](https://doi.org/10.1016/S0021-9991(05)80016-6)) using our 4th order DG scheme.
 Each plot depicts the evolution of variable, namely the water height and longitudinal and latitudinal velocities.
 
-![Rossby-Haurwitz wave](https://user-images.githubusercontent.com/58524567/183117994-13e4c36b-0ffe-4a3f-8241-4acef8ed4859.gif)
-
-
-
-# Utilisation
-The simulation an be executed from the command line using:
-```
-python main.py 20 1 3 4 numpy
-```
-- 20 being the number of longitudinal elements (half this number will be chosen for the number of latitudinal direction)
-- 1 being number of identical vertical levels
-- 3 being the polynomial degree (this leads to a 4th order scheme in space)
-- 4 being the order of Runge-Kutta method
-- numpy being the backend
+<p align="center">
+  <img width="700" src="https://user-images.githubusercontent.com/58524567/183117994-13e4c36b-0ffe-4a3f-8241-4acef8ed4859.gif">
+</p>
