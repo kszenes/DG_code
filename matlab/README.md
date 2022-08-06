@@ -1,6 +1,6 @@
 # DGMG
 ### Created by: Niccolò Discacciati (EPFL, Lausanne) 
-### Extended by: Kalman Szenes (ETH, Zurich)
+### Edited by: Kalman Szenes (ETH, Zurich)
 ### Code available at: 
 `"https://github.com/nickdisca/DG_code/Old version"`             
 
