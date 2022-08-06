@@ -18,12 +18,6 @@ np.warnings.filterwarnings('ignore', category=np.VisibleDeprecationWarning)
 debug = False
 
 # %%
-# Radius of the earth (for spherical geometry)
-radius=1
-
-# Equation type
-eq_type="swe"
-
 # domain
 a = 0; b = 1e7; c = 0; d = 1e7
 
@@ -58,11 +52,6 @@ plot_freq = int(niter / 10)
 
 plot_freq = 20
 # %%
-if debug:
-    nx = 2; ny = 2
-    niter = 1
-    plot_freq = niter + 10
-
 if quad_type == "leg":
 # Gauss-Legendre quadrature
     [pts,wts]=np.polynomial.legendre.leggauss(n_qp_1D)
@@ -73,7 +62,7 @@ elif quad_type == "lob":
     wts=scheme.weights
 else:
     [pts,wts]=np.polynomial.legendre.leggauss(n_qp_1D)
-    print (type,"unsupported quadrature rule, using Legendre")
+    print(quad_type,"unsupported quadrature rule, using Legendre")
 
 pts2d_x = np.kron(pts,np.ones(n_qp_1D))
 pts2d_y = np.kron(np.ones(n_qp_1D),pts)
@@ -90,7 +79,7 @@ vander = Vander(nx, ny, nz, dim, r, n_qp, pts2d_x, pts2d_y, pts, wts2d, backend=
 vander_end = time.perf_counter()
 
 # --- Set initial conditions ---
-neq, u0_nodal = set_initial_conditions(x_c, y_c, a, b, c, d, dim, vander, eq_type)
+neq, u0_nodal = set_initial_conditions(x_c, y_c, a, b, c, d, dim, vander)
 h0, u0, v0 = u0_nodal
 # identical systems in z component
 if nz > 1:
@@ -114,7 +103,7 @@ hu0_modal_gt = nodal2modal_gt(vander.inv_vander_gt, hu0_nodal_gt)
 hv0_modal_gt = nodal2modal_gt(vander.inv_vander_gt, hv0_nodal_gt)
 # --- End ---
 
-mass, inv_mass = compute_mass(vander.phi_val_cell, wts2d, nx, ny, r, hx, hy, y_c, pts2d_y, eq_type)
+mass, inv_mass = compute_mass(vander.phi_val_cell, wts2d, nx, ny, r, hx, hy, pts2d_y)
 
 if nz > 1:
     inv_mass = np.repeat(inv_mass, nz, axis=2)

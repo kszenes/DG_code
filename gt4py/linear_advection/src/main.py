@@ -12,24 +12,14 @@ from run import run
 from plotter import Plotter
 from gt4py_config import backend, dtype, r, n_qp_1D, runge_kutta, n
 
-
 # silence warning
 np.warnings.filterwarnings('ignore', category=np.VisibleDeprecationWarning)
 
-debug = False
-
-# %%
-# Radius of the earth (for spherical geometry)
-radius=6.37122e6
-
-# Equation type
-eq_type="linear"
+#inital conditions ("cosine_bell" or "smooth_sine")
+ic_type = "cosine_bell"
 
 # domain
-if eq_type == 'linear':
-    a = 0; b = 1; c = 0; d =1
-elif eq_type == 'adv_sphere':
-    a = 0; b = 2*np.pi; c = -np.pi; d = np.pi
+a = 0; b = 1; c = 0; d =1
 
 # number of elements in X and Y
 nx = n; ny = n
@@ -63,11 +53,6 @@ niter = int(T / dt)
 plot_freq = int(niter / 10)
 
 # %%
-if debug:
-    nx = 2; ny = 2
-    niter = 1
-    plot_freq = niter + 10
-
 if quad_type == "leg":
 # Gauss-Legendre quadrature
     [pts,wts]=np.polynomial.legendre.leggauss(n_qp_1D)
@@ -94,7 +79,7 @@ vander_start = time.perf_counter()
 vander = Vander(nx, ny, dim, r, n_qp, pts2d_x, pts2d_y, pts, wts2d, backend=backend)
 vander_end = time.perf_counter()
 
-neq, u0_nodal = set_initial_conditions(x_c, y_c, a, b, c, d, dim, vander, "linear")
+neq, u0_nodal = set_initial_conditions(x_c, y_c, a, b, c, d, dim, vander, ic_type)
 
 # plot_solution(u0_nodal, x_c, y_c, r+1, nx, ny, neq, hx, hy, "contour")
 u0_nodal_gt = gt.storage.from_array(data=u0_nodal,
@@ -107,7 +92,7 @@ plotter.plot_solution(u0_nodal_gt, fname="init")
 u0_modal_gt = nodal2modal_gt(vander.inv_vander_gt, u0_nodal_gt)
 u0_m = nodal2modal_gt(vander.inv_vander_gt, u0_nodal_gt)
 
-mass, inv_mass = compute_mass(vander.phi_val_cell, wts2d, nx, ny, r, hx, hy, y_c, pts2d_y, eq_type)
+mass, inv_mass = compute_mass(vander.phi_val_cell, wts2d, nx, ny, r, hx, hy, pts2d_y)
 
 inv_mass_gt = gt.storage.from_array(inv_mass, backend=backend, default_origin=(0,0,0), shape=(nx,ny, 1), dtype=(dtype, (dim, dim)))
 
@@ -151,8 +136,4 @@ l2_error = np.sqrt(np.einsum('ijkl, ijkl', (u0_m - u0_modal_gt), np.einsum('ijkl
 print(f'L2 error: Absolute {l2_error}; Relative {l2_error / initial_mass}\n')
 
 # Plot final time
-if debug:
-    init = True
-else:
-    init = False
 # plotter.plot_solution(u_final_nodal, fname='final_timestep')

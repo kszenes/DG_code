@@ -1,6 +1,6 @@
 import numpy as np
 
-def set_initial_conditions(x_c, y_c, a, b, c, d, dim, vander, eq_type="linear"):
+def set_initial_conditions(x_c, y_c, a, b, c, d, dim, vander):
     nx = x_c.shape[0]
     ny = y_c.shape[0]
     nz = 1

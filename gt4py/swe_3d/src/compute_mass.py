@@ -1,7 +1,7 @@
 import numpy as np
 
 # Function to compute mass matrix and its inverse
-def compute_mass(phi,wts2d,nx,ny,r,hx,hy,y_c,pts2d_y,eq_type) :
+def compute_mass(phi,wts2d,nx,ny,r,hx,hy,pts2d_y) :
     n_qp = len(pts2d_y)
     cos_factor = np.ones((nx, ny, 1, n_qp))
     dim = (r+1)**2
