@@ -1,11 +1,11 @@
 # Problem
-This directory contains files related to our DG solver for the planar Shallow Water Equations:
+This directory contains files related to our DG solver for the planar Shallow Water Equations which is expressed through the following PDE:
 
 $$
 \begin{cases}
     \partial_t (h) + \partial_x (hu) + \partial_y (hv) = 0 \\
     \partial_t (hu) + \partial_x (hu^2 + \frac{1}{2}gh^2) + \partial_y (huv) = 0 \\
-     \partial_t (hu) + \partial_x (huv) = 0  + \partial_y (hv^2 + \frac{1}{2}gh^2) = 0\\
+     \partial_t (hu) + \partial_x (huv) + \partial_y (hv^2 + \frac{1}{2}gh^2) = 0\\
 \end{cases}   
 $$
 
