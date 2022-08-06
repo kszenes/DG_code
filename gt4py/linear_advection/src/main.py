@@ -10,7 +10,7 @@ from modal_conversion import nodal2modal_gt, modal2nodal_gt
 from compute_mass import compute_mass
 from run import run
 from plotter import Plotter
-from gt4py_config import backend, dtype, r, n_qp_1D, runge_kutta, n
+from gt4py_config import backend, dtype, r, n_qp_1D, runge_kutta, n, perf_flag
 
 # silence warning
 np.warnings.filterwarnings('ignore', category=np.VisibleDeprecationWarning)
@@ -82,12 +82,14 @@ vander_end = time.perf_counter()
 neq, u0_nodal = set_initial_conditions(x_c, y_c, a, b, c, d, dim, vander, ic_type)
 
 # plot_solution(u0_nodal, x_c, y_c, r+1, nx, ny, neq, hx, hy, "contour")
-u0_nodal_gt = gt.storage.from_array(data=u0_nodal,
-    backend=backend, default_origin=(0,0,0), shape=(nx,ny,1), dtype=(dtype, (dim,)))
+u0_nodal_gt = gt.storage.from_array(
+    data=u0_nodal,backend=backend, default_origin=(0,0,0), shape=(nx,ny,1), dtype=(dtype, (dim,))
+)
 
 plotter = Plotter(x_c, y_c, r+1, nx, ny, neq, hx, hy, plot_freq)
 
-plotter.plot_solution(u0_nodal_gt, fname="init")
+if not perf_flag:
+    plotter.plot_solution(u0_nodal_gt, fname="init")
 
 u0_modal_gt = nodal2modal_gt(vander.inv_vander_gt, u0_nodal_gt)
 u0_m = nodal2modal_gt(vander.inv_vander_gt, u0_nodal_gt)

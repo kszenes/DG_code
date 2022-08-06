@@ -3,7 +3,7 @@ import time
 import gt4py.gtscript as gtscript
 import gt4py as gt
 
-from gt4py_config import dtype, backend, backend_opts, runge_kutta
+from gt4py_config import dtype, backend, backend_opts, runge_kutta, perf_flag
 
 import stencils
 import boundary_conditions
@@ -155,7 +155,7 @@ def run(uM_gt, vander, inv_mass, wts2d, wts1d, dim, n_qp1d, n_qp2d, hx, hy, nx, 
 
 
         # === OUTPUT DONE === 
-        if i % plot_freq == 0:
+        if i % plot_freq == 0 and not perf_flag:
             print(f'Iteration {i} done')
             stencils.modal2nodal(vander.vander_gt, uM_gt, u_nodal)
             plotter.plot_solution(u_nodal, fname=f"simulation_{dt*i:.1f}")

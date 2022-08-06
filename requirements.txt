@@ -1,0 +1,8 @@
+configuration==0.4.2
+element==0.1
+functions==0.7.0
+matplotlib==3.3.4
+pandas==1.2.4
+pytest==6.2.3
+quadpy==0.16.16
+scipy==1.7.1
