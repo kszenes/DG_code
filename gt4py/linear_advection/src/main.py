@@ -43,7 +43,6 @@ courant = 0.2
 
 dx = np.min((hx, hy))
 dt = courant * dx / (r + 1)
-alpha = courant * dx / dt
 alpha = 1.0
 
 T = 1
