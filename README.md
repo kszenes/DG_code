@@ -8,7 +8,6 @@ GT4Py provides the user with a high-level Python interface for stencil computati
 This work builds upon a previous intenship at CSCS conducted by Niccolo Discacciati in 2019.
 In particular, his Matlab [code](https://github.com/nickdisca/DG_code) has been adapted and used as a reference implementation.
 
-### Filestructure
 The repository has the following filestructure:
 ```
 DG_code
