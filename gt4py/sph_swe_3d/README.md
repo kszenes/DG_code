@@ -39,7 +39,3 @@ Each plot depicts the evolution of variable, namely the water height and longitu
 <p align="center">
   <img width="700" src="https://user-images.githubusercontent.com/58524567/183117994-13e4c36b-0ffe-4a3f-8241-4acef8ed4859.gif">
 </p>
-
-<p align="center">
-  <img width=400 src="https://user-images.githubusercontent.com/58524567/183141418-8cd5be6e-aaff-4640-9097-de5c85f6ca86.gif">
-</p>
