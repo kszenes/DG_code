@@ -24,7 +24,7 @@ DG_code
 - In addition, my final [report](https://github.com/kszenes/DG_code/blob/master/docs/main.pdf) contains the mathematical theory behind the DG method, implementation details as well as performance benchmarks carried out on the Piz Daint supercomputer.
 
 ### Installation
-- First install GT4Py; installation instructions can be found in the [repository](https://github.com/GridTools/gt4py).
+- First install GT4Py. Currently, this must be done through my personal [fork](https://github.com/kszenes/gt4py) of GT4Py however it will be merged into the production code soon.
 - Then install the additional dependencies contained in the requirements.txt file using pip: `pip install -r requirements.txt`.
 
 
