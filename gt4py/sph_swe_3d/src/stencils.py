@@ -75,23 +75,22 @@ def fused_internal_stencils(
         hv_qp = phi @ hv
 
         fh_x = hu_qp
-        fh_y = hv_qp
-
         fhu_x = hu_qp * hu_qp / h_qp + h_qp * h_qp * g / 2
-        fhu_y = hu_qp * hv_qp / h_qp
-
         fhv_x = hu_qp * hv_qp / h_qp
+
+        fh_y = hv_qp
+        fhu_y = hu_qp * hv_qp / h_qp
         fhv_y = hv_qp * hv_qp / h_qp + h_qp * h_qp * g / 2
 
         rhs_h = (phi_grad_x.T @ (fh_x * w) / bd_det_x + phi_grad_y.T @ (fh_y * w * cos_fact) / bd_det_y) * determ
         rhs_hu = (phi_grad_x.T @ (fhu_x * w) / bd_det_x + phi_grad_y.T @ (fhu_y * w * cos_fact) / bd_det_y) * determ
         rhs_hv = (phi_grad_x.T @ (fhv_x * w) / bd_det_x + phi_grad_y.T @ (fhv_y * w * cos_fact) / bd_det_y) * determ
 
+        # Coriolis
+        rhs_hu += (phi.T @ ((coriolis * cos_fact * radius + hu_qp / h_qp * sin_fact) * hv_qp * w)) * determ
+        rhs_hv -= (phi.T @ ((coriolis * cos_fact * radius + hu_qp / h_qp * sin_fact) * hu_qp * w)) * determ
         # Source Stencil
         rhs_hv -= (phi.T @ (0.5 * g * sin_fact * h_qp *h_qp * w)) * determ
-        # Coriolis
-        rhs_hu += (phi.T @ (coriolis * cos_fact * hv_qp * w)) * radius * determ
-        rhs_hv -= (phi.T @ (coriolis * cos_fact * hu_qp * w)) * radius * determ
 
         # Boundary
         h_n = phi_bd_N @ h
