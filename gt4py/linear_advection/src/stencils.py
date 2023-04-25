@@ -1,4 +1,4 @@
-import gt4py.gtscript as gtscript
+from gt4py.cartesian import gtscript
 import gt4py as gt
 
 from gt4py_config import dtype, backend, backend_opts, dim, n_qp, n_qp_1D

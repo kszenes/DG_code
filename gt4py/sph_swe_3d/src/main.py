@@ -2,7 +2,7 @@
 import numpy as np
 import time
 import gt4py as gt
-import quadpy as qp
+# import quadpy as qp
 
 from vander import Vander
 from initial_conditions import set_initial_conditions
@@ -43,22 +43,19 @@ quad_type = "leg"
 n_qp = n_qp_1D*n_qp_1D
 
 DAY_IN_SEC = 86400
-T = 1 * DAY_IN_SEC
-# alpha = 170.0 
-    # alpha = 170.0 
-# alpha = 170.0 
-dt = 5.0
+num_days = 8
+T = num_days * DAY_IN_SEC
 
 
 # %%
 if quad_type == "leg":
     # Gauss-Legendre quadrature
     [pts, wts] = np.polynomial.legendre.leggauss(n_qp_1D)
-elif quad_type == "lob":
-    # Gauss-Lobatto quadrature
-    scheme = qp.line_segment.gauss_lobatto(n_qp_1D)
-    pts = scheme.points
-    wts = scheme.weights
+# elif quad_type == "lob":
+#     # Gauss-Lobatto quadrature
+#     scheme = qp.line_segment.gauss_lobatto(n_qp_1D)
+#     pts = scheme.points
+#     wts = scheme.weights
 else:
     [pts, wts] = np.polynomial.legendre.leggauss(n_qp_1D)
     print(quad_type, "unsupported quadrature rule, using Legendre")
@@ -96,10 +93,9 @@ courant = 0.009
 dt = courant * min((radius * np.sin(hx) * np.sin(hy), radius * np.sin(hx) * np.cos(hy))) / ((r+1) * alpha)  
 
 # Timestepping and plotting set here!!!
-# niter = int(T/dt)
-niter = 100
-
-plot_freq = 10
+niter = int(T/dt)
+# niter = 100
+plot_freq = niter / num_days
 
 h0_nodal_gt = gt.storage.from_array(data=h0,
       backend=backend, default_origin=(0,0,0), shape=(nx,ny,nz), dtype=(dtype, (dim,)))

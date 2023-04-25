@@ -15,5 +15,5 @@ dtype_modal_vec = (dtype, (dim,))
 
 backend_opts = {
     "rebuild": False,
-    "verbose": True
+#    "verbose": True
 }

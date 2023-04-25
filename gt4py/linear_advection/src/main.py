@@ -2,7 +2,6 @@
 import numpy as np
 import time
 import gt4py as gt
-import quadpy as qp
 
 from vander import Vander
 from initial_conditions import set_initial_conditions
@@ -55,11 +54,6 @@ plot_freq = int(niter / 10)
 if quad_type == "leg":
 # Gauss-Legendre quadrature
     [pts,wts]=np.polynomial.legendre.leggauss(n_qp_1D)
-elif quad_type == "lob":
-# Gauss-Lobatto quadrature
-    scheme=qp.line_segment.gauss_lobatto(n_qp_1D)
-    pts=scheme.points
-    wts=scheme.weights
 else:
     [pts,wts]=np.polynomial.legendre.leggauss(n_qp_1D)
     print (type,"unsupported quadrature rule, using Legendre")

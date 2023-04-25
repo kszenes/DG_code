@@ -1,5 +1,5 @@
 import numpy as np
-import gt4py.gtscript as gtscript
+from gt4py.cartesian import gtscript
 import gt4py as gt
 
 from boundary_conditions import apply_pbc
