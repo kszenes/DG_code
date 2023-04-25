@@ -1,4 +1,6 @@
-.PHONY: numpy cpu gpu
+.PHONY: all numpy cpu gpu
+all: numpy
+
 numpy:
 	python main.py -n 20 -p 1 -rk 1 -b numpy
 
